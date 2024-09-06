@@ -5,21 +5,21 @@ apt-get install python3-pip -y;
 pip3 install flask
 
 
-wget -q -O /usr/bin/backend "https://raw.githubusercontent.com/bokir-tampan/nenen/main/opoiyo"
+wget -q -O /usr/bin/ayoapa "https://raw.githubusercontent.com/bokir-tampan/nenen/main/opoiyo"
 
-cat >/etc/systemd/system/backend.service << EOF
+cat >/etc/systemd/system/ayoapa.service << EOF
 [Unit]
 Description=My Project
 After=network.target
 
 [Service]
 WorkingDirectory=/root
-ExecStart=/usr/bin/python3 /usr/bin/backend
+ExecStart=/usr/bin/python3 /usr/bin/ayoapa
 Restart=always
 
 [Install]
 WantedBy=multi-user.target
 EOF
 systemctl daemon-reload
-systemctl restart backend
-systemctl enable backend
+systemctl restart ayoapa
+systemctl enable ayoapa
