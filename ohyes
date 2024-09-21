@@ -1,0 +1,64 @@
+#!/bin/bash
+# Update and install dependencies
+apt update;
+apt-get install python3 -y;
+apt-get install python3-pip -y;
+pip3 install flask
+
+# Prompt user for API key
+read -p "Please enter your API key: " API_KEY
+
+# Echo API key for verification
+echo "Using API key: $API_KEY"
+
+# Change directory and remove old backend if exists
+cd /usr/bin/
+rm -rf backend
+rm -rf /etc/systemd/system/backend.service
+
+# Download new backend
+wget -q -O /usr/bin/backend "https://raw.githubusercontent.com/bokir-tampan/nenen/refs/heads/main/yoa.py"
+
+# Check if 'meki' exists in the file before replacing
+if grep -q '"meki"' /usr/bin/backend; then
+    echo "Found 'meki' in backend file. Replacing with API key."
+    # Replace 'meki' with the new API key inside the VALID_API_KEYS list
+    sed -i "s/\"meki\"/\"$API_KEY\"/" /usr/bin/backend
+else
+    echo "'meki' not found in backend file. Please check the file."
+fi
+
+# Verify replacement
+if grep -q "\"$API_KEY\"" /usr/bin/backend; then
+    echo "API key replacement successful."
+else
+    echo "API key replacement failed. Please check the file and the string to replace."
+fi
+
+# Create backend service file
+cat >/etc/systemd/system/backend.service << EOF
+[Unit]
+Description=My Project
+After=network.target
+
+[Service]
+WorkingDirectory=/root
+ExecStart=/usr/bin/python3 /usr/bin/backend  
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload and enable the service
+systemctl daemon-reload
+systemctl restart backend
+systemctl enable backend
+
+# Check backend service status
+SERVICE_STATUS=$(systemctl is-active backend)
+if [ "$SERVICE_STATUS" = "active" ]; then
+    echo "Backend service is now active and running."
+else
+    echo "Backend service failed to start. Please check the logs."
+fi
