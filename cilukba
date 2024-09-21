@@ -6,8 +6,7 @@ apt-get install python3-pip -y;
 pip3 install flask
 
 # Prompt user for API key
-echo "Please enter your API key:"
-read API_KEY
+read -p "Please enter your API key:" API_KEY
 
 # Validate the input
 if [ -z "$API_KEY" ]; then
