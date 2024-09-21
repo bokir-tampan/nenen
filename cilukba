@@ -8,11 +8,6 @@ pip3 install flask
 # Prompt user for API key
 read -p "Please enter your API key:" API_KEY
 
-# Validate the input
-if [ -z "$API_KEY" ]; then
-    echo "API key cannot be empty!"
-    exit 1
-fi
 
 # Change directory and remove old backend if exists
 cd /usr/bin/
