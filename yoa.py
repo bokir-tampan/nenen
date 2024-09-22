@@ -686,7 +686,7 @@ def renew_ssh():
     except Exception as e:
         return f"error: {str(e)}"
 
-    return f"User {user} ssh extended to {new_exp_date}"
+    return f"User {username} ssh extended to {new_exp_date}"
 
 
 if __name__ == "__main__":
