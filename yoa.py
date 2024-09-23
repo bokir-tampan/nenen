@@ -231,7 +231,7 @@ def create_trojan():
         subprocess.run(["systemctl", "restart", "drawit"], check=True)
 
         trojan_link = f"trojan://{uid}@bugkamu.com:443?path=%2Ftrojan-ws&security=tls&host={domain}&type=ws&sni={domain}#{user}"
-        trojan_link1 = f"trojan://{uid}@{domain}:443?mode=gun&security=tls&type=grpc&serviceName=trojan-grpc&sni=bug.com#{user}"
+        trojan_link1 = f"trojan://{uid}@{domain}:443?mode=gun&security=tls&type=grpc&serviceName=trojan&sni=bug.com#{user}"
 
         return {
             "trojan_link": trojan_link,
@@ -285,7 +285,7 @@ def trial_trojan():
         subprocess.run(["systemctl", "restart", "drawit"], check=True)
 
         trojan_link = f"trojan://{uid}@bugkamu.com:443?path=%2Ftrojan-ws&security=tls&host={domain}&type=ws&sni={domain}#{user}"
-        trojan_link1 = f"trojan://{uid}@{domain}:443?mode=gun&security=tls&type=grpc&serviceName=trojan-grpc&sni=bug.com#{user}"
+        trojan_link1 = f"trojan://{uid}@{domain}:443?mode=gun&security=tls&type=grpc&serviceName=trojan&sni=bug.com#{user}"
 
         return {
             "trojan_link": trojan_link,
@@ -621,7 +621,7 @@ def delete_user(protocol, user):
 def trial_ssh():
     # Generate random username and password
     username = "trialX-" + str(random.randint(10, 1000))
-    password = "bokirganteng-" + str(random.randint(10, 1000))
+    password = "semok-" + str(random.randint(10, 1000))
     exp_days = "1"
     today = datetime.now()
     later = today + timedelta(days=int(exp_days))  # Correcting timedelta usage
