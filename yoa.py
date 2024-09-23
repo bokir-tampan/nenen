@@ -339,7 +339,7 @@ def trial_vless():
         subprocess.run(["systemctl", "restart", "sketsa"], check=True)
 
         vless_link = f"vless://{uid}@bugkamu.com:443?path=%2Fvless&security=tls&host={domain}&type=ws&sni={domain}#{user}"
-        vless_link1 = f"vless://{uid}@{domain}:443?mode=gun&security=tls&type=grpc&serviceName=vless-grpc&sni=bug.com#{user}"
+        vless_link1 = f"vless://{uid}@{domain}:443?mode=gun&security=tls&type=grpc&serviceName=vless&sni=bug.com#{user}"
         vless_link2 = f"vless://{uid}@bugkamu.com:80?path=%2Fvless&security=none&host={domain}&type=ws&sni={domain}#{user}"
 
         return {
@@ -513,7 +513,7 @@ def create_vless():
         subprocess.run(["systemctl", "restart", "sketsa"], check=True)
 
         vless_link = f"vless://{uid}@bugkamu.com:443?path=%2Fvless&security=tls&host={domain}&type=ws&sni={domain}#{user}"
-        vless_link1 = f"vless://{uid}@{domain}:443?mode=gun&security=tls&type=grpc&serviceName=vless-grpc&sni=bug.com#{user}"
+        vless_link1 = f"vless://{uid}@{domain}:443?mode=gun&security=tls&type=grpc&serviceName=vless&sni=bug.com#{user}"
         vless_link2 = f"vless://{uid}@bugkamu.com:80?path=%2Fvless&security=none&host={domain}&type=ws&sni={domain}#{user}"
 
         return {
