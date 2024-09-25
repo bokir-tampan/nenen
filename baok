@@ -20,16 +20,9 @@ rm -rf /etc/systemd/system/backend.service
 wget -q -O /usr/bin/backend "https://raw.githubusercontent.com/bokir-tampan/nenen/refs/heads/main/yoa.py"
 
 # Replace the 'meki' key with the new API key entered by the user
-sed -i "s/'meki'/'$API_KEY'/" /usr/bin/backend
+sed -i "s/VALID_API_KEYS = \[\"meki\"\]/VALID_API_KEYS = [\"$API_KEY\"]/g" /usr/bin/backend
 
-# Check if the replacement was successful
-if grep -q "'$API_KEY'" /usr/bin/backend; then
-    echo "API key replacement successful."
-else
-    echo "API key replacement failed. Please check the file and the string to replace."
-fi
 
-# Create backend service file
 cat >/etc/systemd/system/backend.service << EOF
 [Unit]
 Description=My Project
@@ -44,7 +37,8 @@ Restart=always
 WantedBy=multi-user.target
 EOF
 
-# Reload and enable the service
 systemctl daemon-reload
 systemctl restart backend
 systemctl enable backend
+
+echo "done bang"
