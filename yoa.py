@@ -212,12 +212,12 @@ def create_trojan():
     bytes_quota = int(quota) * (1024 ** 3)  # 1 GB = 1024^3 bytes
 
     try:
-        sed_command = r'sed -i "/#trojan$/a\###ws {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
+        sed_command = r'sed -i "/#trojan$/a\###ws {} {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
             user, later.strftime('%Y-%m-%d'), str(uid), user, "/etc/default/syncron/drawit/drawit.json")
         logging.debug(f"Running command: {sed_command}")
         subprocess.run(sed_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        sed_command1 = r'sed -i "/#grpctrojan$/a\###grpc {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
+        sed_command1 = r'sed -i "/#grpctrojan$/a\###grpc {} {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
             user, later.strftime('%Y-%m-%d'), str(uid), user, "/etc/default/syncron/drawit/drawit.json")
         logging.debug(f"Running command: {sed_command1}")
         subprocess.run(sed_command1, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -266,12 +266,12 @@ def trial_trojan():
     bytes_quota = int(quota) * (1024 ** 3)  # 1 GB = 1024^3 bytes
 
     try:
-        sed_command = r'sed -i "/#trojan$/a\###ws {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
+        sed_command = r'sed -i "/#trojan$/a\###ws {} {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
             user, later.strftime('%Y-%m-%d'), str(uid), user, "/etc/default/syncron/drawit/drawit.json")
         logging.debug(f"Running command: {sed_command}")
         subprocess.run(sed_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        sed_command1 = r'sed -i "/#grpctrojan$/a\###grpc {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
+        sed_command1 = r'sed -i "/#grpctrojan$/a\###grpc {} {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
             user, later.strftime('%Y-%m-%d'), str(uid), user, "/etc/default/syncron/drawit/drawit.json")
         logging.debug(f"Running command: {sed_command1}")
         subprocess.run(sed_command1, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -320,12 +320,12 @@ def trial_vless():
     bytes_quota = int(quota) * (1024 ** 3)  # 1 GB = 1024^3 bytes
 
     try:
-        sed_command = r'sed -i "/#vless$/a\###ws {} {}\\n}},{{\"id\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
+        sed_command = r'sed -i "/#vless$/a\###ws {} {} {}\\n}},{{\"id\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
             user, later.strftime('%Y-%m-%d'), str(uid), user, "/etc/default/syncron/sketsa/sketsa.json")
         logging.debug(f"Running command: {sed_command}")
         subprocess.run(sed_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        sed_command1 = r'sed -i "/#grpcvless$/a\###grpc {} {}\\n}},{{\"id\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
+        sed_command1 = r'sed -i "/#grpcvless$/a\###grpc {} {} {}\\n}},{{\"id\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
             user, later.strftime('%Y-%m-%d'), str(uid), user, "/etc/default/syncron/sketsa/sketsa.json")
         logging.debug(f"Running command: {sed_command1}")
         subprocess.run(sed_command1, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -494,12 +494,12 @@ def create_vless():
     bytes_quota = int(quota) * (1024 ** 3)  # 1 GB = 1024^3 bytes
 
     try:
-        sed_command = r'sed -i "/#vless$/a\###ws {} {}\\n}},{{\"id\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
+        sed_command = r'sed -i "/#vless$/a\###ws {} {} {}\\n}},{{\"id\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
             user, later.strftime('%Y-%m-%d'), str(uid), user, "/etc/default/syncron/sketsa/sketsa.json")
         logging.debug(f"Running command: {sed_command}")
         subprocess.run(sed_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        sed_command1 = r'sed -i "/#grpcvless$/a\###grpc {} {}\\n}},{{\"id\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
+        sed_command1 = r'sed -i "/#grpcvless$/a\###grpc {} {} {}\\n}},{{\"id\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
             user, later.strftime('%Y-%m-%d'), str(uid), user, "/etc/default/syncron/sketsa/sketsa.json")
         logging.debug(f"Running command: {sed_command1}")
         subprocess.run(sed_command1, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
