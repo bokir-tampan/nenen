@@ -230,7 +230,7 @@ def create_trojan():
 
         subprocess.run(["systemctl", "restart", "drawit"], check=True)
 
-        trojan_link = f"trojan://{uid}@bugkamu.com:443?path=%2Ftrojan-ws&security=tls&host={domain}&type=ws&sni={domain}#{user}"
+        trojan_link = f"trojan://{uid}@bugkamu.com:443?path=%2Ftrojan&security=tls&host={domain}&type=ws&sni={domain}#{user}"
         trojan_link1 = f"trojan://{uid}@{domain}:443?mode=gun&security=tls&type=grpc&serviceName=trojan&sni=bug.com#{user}"
 
         return {
@@ -284,7 +284,7 @@ def trial_trojan():
 
         subprocess.run(["systemctl", "restart", "drawit"], check=True)
 
-        trojan_link = f"trojan://{uid}@bugkamu.com:443?path=%2Ftrojan-ws&security=tls&host={domain}&type=ws&sni={domain}#{user}"
+        trojan_link = f"trojan://{uid}@bugkamu.com:443?path=%2Ftrojan&security=tls&host={domain}&type=ws&sni={domain}#{user}"
         trojan_link1 = f"trojan://{uid}@{domain}:443?mode=gun&security=tls&type=grpc&serviceName=trojan&sni=bug.com#{user}"
 
         return {
