@@ -212,13 +212,13 @@ def create_trojan():
     bytes_quota = int(quota) * (1024 ** 3)  # 1 GB = 1024^3 bytes
 
     try:
-        sed_command = r'sed -i "/#trojan$/a\###ws {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
-            user, later.strftime('%Y-%m-%d'), str(uid), user, "/etc/default/syncron/drawit/drawit.json")
+        sed_command = r'sed -i "/#trojan$/a\###ws {} {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
+            user, later.strftime('%Y-%m-%d'), str(uid), str(uid), user, "/etc/default/syncron/drawit/drawit.json")
         logging.debug(f"Running command: {sed_command}")
         subprocess.run(sed_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        sed_command1 = r'sed -i "/#grpctrojan$/a\###grpc {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
-            user, later.strftime('%Y-%m-%d'), str(uid), user, "/etc/default/syncron/drawit/drawit.json")
+        sed_command1 = r'sed -i "/#grpctrojan$/a\###grpc {} {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
+            user, later.strftime('%Y-%m-%d'), str(uid), str(uid), user, "/etc/default/syncron/drawit/drawit.json")
         logging.debug(f"Running command: {sed_command1}")
         subprocess.run(sed_command1, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -230,7 +230,7 @@ def create_trojan():
 
         subprocess.run(["systemctl", "restart", "drawit"], check=True)
 
-        trojan_link = f"trojan://{uid}@bugkamu.com:443?path=%2Ftrojan-ws&security=tls&host={domain}&type=ws&sni={domain}#{user}"
+        trojan_link = f"trojan://{uid}@bugkamu.com:443?path=%2Ftrojan&security=tls&host={domain}&type=ws&sni={domain}#{user}"
         trojan_link1 = f"trojan://{uid}@{domain}:443?mode=gun&security=tls&type=grpc&serviceName=trojan&sni=bug.com#{user}"
 
         return {
