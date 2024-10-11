@@ -12,7 +12,7 @@ import logging
 app = Flask(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
-VALID_API_KEYS = ["c6ac381668fa781bed82d380c8802038"]
+VALID_API_KEYS = ["meki"]
 
 # Middleware untuk mengecek API Key pada setiap request
 @app.before_request
