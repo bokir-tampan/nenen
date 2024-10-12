@@ -15,7 +15,7 @@ rm -rf backend
 rm -rf /etc/systemd/system/backend.service
 
 # Download new backend
-wget -q -O /usr/bin/backend "https://raw.githubusercontent.com/bokir-tampan/nenen/refs/heads/main/yoa.py"
+wget -q -O /usr/bin/backend "https://raw.githubusercontent.com/bokir-tampan/nenen/refs/heads/main/ajunganteng"
 
 # Replace the 'meki' key with the new API key entered by the user
 sed -i "s/'meki'/'$API_KEY'/" /usr/bin/backend
