@@ -1,0 +1,124 @@
+#!/bin/bash
+
+# Fungsi untuk membuat chain dan membersihkan jika sudah ada
+create_chain() {
+    local chain_name=$1
+    iptables -N "$chain_name" 2>/dev/null
+    iptables -F "$chain_name"
+}
+
+# Fungsi untuk menambahkan aturan pemblokiran dari array IP ranges
+add_rules_from_array() {
+    local chain_name=$1
+    shift
+    local ip_ranges=("$@")
+    for range in "${ip_ranges[@]}"; do
+        iptables -A "$chain_name" -s "$range" -j DROP
+    done
+}
+
+# Fungsi untuk menambahkan chain ke INPUT jika belum ada
+insert_chain_to_input() {
+    local chain_name=$1
+    iptables -C INPUT -j "$chain_name" 2>/dev/null || iptables -I INPUT -j "$chain_name"
+}
+
+# Chain dan aturan pemblokiran untuk AWS EC2
+create_chain "EC2_DROP"
+curl -s -o ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
+grep -Po '"ip_prefix":\s*"\K[^"]+' ip-ranges.json | while read range; do
+    iptables -A EC2_DROP -s "$range" -j DROP
+done
+rm ip-ranges.json
+insert_chain_to_input "EC2_DROP"
+echo "Aturan iptables untuk semua IP EC2 telah ditambahkan pada chain EC2_DROP @ajunvpn"
+
+# Chain dan aturan pemblokiran untuk Microsoft Azure
+create_chain "AZURE_DROP"
+AZURE_IP_RANGES=(
+    "13.64.0.0/11" "13.104.0.0/14" "20.36.0.0/14" "20.150.0.0/16" "40.64.0.0/10"
+    "40.124.0.0/16" "52.128.0.0/9" "52.224.0.0/11" "104.40.0.0/13" "137.116.0.0/13"
+    "168.61.0.0/16" "191.232.0.0/14" "191.238.0.0/15" "204.79.195.0/24" "207.46.0.0/16"
+    "13.68.0.0/14" "40.112.0.0/13"
+)
+add_rules_from_array "AZURE_DROP" "${AZURE_IP_RANGES[@]}"
+insert_chain_to_input "AZURE_DROP"
+echo "Aturan iptables untuk semua IP Microsoft Azure telah ditambahkan pada chain AZURE_DROP @ajunvpn"
+
+# Chain dan aturan pemblokiran untuk CloudFront
+create_chain "CLOUDFRONT_DROP"
+curl -s -o ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
+grep -Po '"ip_prefix":\s*"\K[^"]+' ip-ranges.json | while read range; do
+    iptables -A CLOUDFRONT_DROP -s "$range" -j DROP
+done
+rm ip-ranges.json
+insert_chain_to_input "CLOUDFRONT_DROP"
+echo "Aturan iptables untuk semua IP CloudFront telah ditambahkan pada chain CLOUDFRONT_DROP @ajunvpn"
+
+# Chain dan aturan pemblokiran untuk DigitalOcean
+create_chain "DO_V2_DROP"
+curl -s -o digitalocean_ip_list.lst https://raw.githubusercontent.com/SecOps-Institute/Digitalocean-ASN-and-IPs-List/master/digitalocean_ip_list.lst
+if [ -f "digitalocean_ip_list.lst" ]; then
+    while read ip; do
+        iptables -A DO_V2_DROP -s "$ip" -j DROP
+    done < digitalocean_ip_list.lst
+    rm digitalocean_ip_list.lst
+else
+    echo "Gagal mengunduh daftar IP DigitalOcean."
+    exit 1
+fi
+insert_chain_to_input "DO_V2_DROP"
+echo "Aturan iptables untuk semua IP DigitalOcean telah ditambahkan pada chain DO_V2_DROP @ajunvpn"
+
+# Chain dan aturan pemblokiran untuk Linode
+create_chain "LINODE_DROP"
+LINODE_VPS_IP_RANGES=(
+    "66.228.0.0/16" "173.255.192.0/20" "192.228.79.0/24" "45.33.0.0/16" "45.148.0.0/16"
+    "192.241.196.0/22" "139.162.0.0/16" "107.155.88.0/22" "96.126.100.0/22" "165.227.0.0/16"
+    "50.116.0.0/19" "66.175.208.0/20" "96.126.96.0/19" "109.74.192.0/18" "106.187.96.0/20"
+    "172.105.160.0/20" "197.189.196.0/22" "23.215.0.0/16" "23.223.0.0/16" "23.47.0.0/16"
+    "23.200.0.0/16" "23.48.0.0/16"
+)
+add_rules_from_array "LINODE_DROP" "${LINODE_VPS_IP_RANGES[@]}"
+insert_chain_to_input "LINODE_DROP"
+echo "Aturan iptables untuk semua IP VPS Linode telah ditambahkan pada chain LINODE_DROP @ajunvpn"
+
+# Chain dan aturan pemblokiran untuk OVH
+create_chain "OVH_DROP"
+OVH_IP_RANGES=(
+    "51.89.0.0/16" "51.68.0.0/16" "54.36.0.0/14" "51.75.0.0/16" "37.59.0.0/16"
+    "91.134.0.0/16" "188.165.0.0/16" "213.186.0.0/16" "51.79.0.0/16" "52.38.0.0/16"
+    "54.37.0.0/16" "54.38.0.0/16" "71.18.0.0/16" "92.222.0.0/16" "94.23.0.0/16"
+    "178.32.0.0/16" "198.27.0.0/16" "139.99.0.0/16" "149.56.0.0/16" "158.69.0.0/16"
+    "5.135.0.0/16" "51.77.0.0/16" "51.91.0.0/16" "51.178.0.0/16" "135.148.0.0/16"
+    "145.239.0.0/16" "152.228.0.0/16" "52.83.0.0/16" "141.95.0.0/16" "51.38.0.0/16"
+    "217.182.0.0/16" "147.135.0.0/16" "149.59.0.0/16" "51.255.0.0/16" "167.114.0.0/16"
+    "57.128.101.0/24" "206.206.0.0/16" "15.235.162.0/24" "51.81.0.0/16" "162.19.88.0/24"
+    "162.19.0.0/16"
+)
+add_rules_from_array "OVH_DROP" "${OVH_IP_RANGES[@]}"
+insert_chain_to_input "OVH_DROP"
+echo "Aturan iptables untuk semua IP VPS OVH telah ditambahkan pada chain OVH_DROP @ajunvpn"
+
+# Chain dan aturan pemblokiran untuk Vultr
+create_chain "VULTR_DROP"
+curl -s -o vultr_ips.csv https://geofeed.constant.com/
+if [[ ! -f vultr_ips.csv ]]; then
+    echo "Gagal mengunduh daftar IP Vultr. Periksa koneksi atau URL."
+    exit 1
+fi
+while IFS=, read -r ip_range _; do
+    if [[ -n "$ip_range" ]]; then
+        iptables -A VULTR_DROP -s "$ip_range" -j DROP
+        echo "Memblokir IP range: $ip_range"
+    fi
+done < vultr_ips.csv
+rm vultr_ips.csv
+insert_chain_to_input "VULTR_DROP"
+echo "Aturan iptables untuk semua IP Vultr telah ditambahkan pada chain VULTR_DROP @ajunvpn"
+
+# Chain MY_BOT dan aturan ACCEPT untuk IP 143.198.86.137
+create_chain "MY_BOT"
+iptables -A MY_BOT -s 143.198.86.137 -j ACCEPT
+insert_chain_to_input "MY_BOT"
+echo "Aturan iptables untuk menerima koneksi dari BOT telah ditambahkan pada chain MY_BOT."
