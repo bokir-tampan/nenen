@@ -14,7 +14,6 @@ logging.basicConfig(level=logging.DEBUG)
 
 VALID_API_KEYS = ["meki"]
 
-# Middleware untuk mengecek API Key pada setiap request
 @app.before_request
 def check_api_key():
     api_key = request.headers.get("Authorization")
@@ -22,7 +21,6 @@ def check_api_key():
         logging.error("Unauthorized access attempt.")
         return jsonify({"error": "Unauthorized"}), 401
 
-# Mengambil nilai domain dari file
 def get_domain():
     with open('/etc/xray/domain', 'r') as file:
         return file.read().strip()
@@ -51,9 +49,7 @@ def create_vmess():
     quota = request.args.get("quota")
     limit_ip = request.args.get("limitip")
     exp = request.args.get("exp")
-
     logging.debug(f"Received parameters: user={user}, quota={quota}, limit_ip={limit_ip}, exp={exp}")
-
     if not all([user, quota, limit_ip, exp]):
         logging.error("Missing parameters")
         return "Missing parameters", 400
@@ -138,7 +134,7 @@ def trial_vmess():
     later = today + timedelta(hours=exp)
     later1 = today + timedelta(days=exp)
     exp_timestamp = int(later.timestamp())
-    bytes_quota = int(quota) * (1024 ** 3)  # 1 GB = 1024^3 bytes
+    bytes_quota = int(quota) * (1024 ** 3)  
 
     try:
         sed_command = (
@@ -209,7 +205,7 @@ def create_trojan():
 
     today = datetime.today()
     later = today + timedelta(days=exp)
-    bytes_quota = int(quota) * (1024 ** 3)  # 1 GB = 1024^3 bytes
+    bytes_quota = int(quota) * (1024 ** 3)  
 
     try:
         sed_command = r'sed -i "/#trojan$/a\###ws {} {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
@@ -263,7 +259,7 @@ def trial_trojan():
     later = today + timedelta(hours=exp)
     later1 = today + timedelta(days=exp)
     exp_timestamp = int(later.timestamp())
-    bytes_quota = int(quota) * (1024 ** 3)  # 1 GB = 1024^3 bytes
+    bytes_quota = int(quota) * (1024 ** 3)  
 
     try:
         sed_command = r'sed -i "/#trojan$/a\###ws {} {} {}\\n}},{{\"password\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
@@ -317,7 +313,7 @@ def trial_vless():
     later = today + timedelta(hours=exp)
     later1 = today + timedelta(days=exp)
     exp_timestamp = int(later.timestamp())
-    bytes_quota = int(quota) * (1024 ** 3)  # 1 GB = 1024^3 bytes
+    bytes_quota = int(quota) * (1024 ** 3)  
 
     try:
         sed_command = r'sed -i "/#vless$/a\###ws {} {} {}\\n}},{{\"id\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
@@ -363,85 +359,48 @@ def write_file(file_path, lines):
         file.writelines(lines)
         
 @app.route("/renewvmess")
-def renewvmess():
-    masaaktif = int(request.args.get("exp"))
-    user = request.args.get("user")
-    vmess_file = '/etc/.vmess'
-    paradis_file = '/etc/default/syncron/paradis/paradis.json'
-    lines = read_file(vmess_file)
-    user_line = next((line for line in lines if line.startswith(f"### {user} ")), None)
-    if not user_line:
-        return "User not found"
-    exp = user_line.split()[2]
-    now = datetime.now().strftime("%Y-%m-%d")
-    current_exp_date = datetime.strptime(exp, "%Y-%m-%d")
-    current_date = datetime.strptime(now, "%Y-%m-%d")
-    delta_days = (current_exp_date - current_date).days
-    new_exp_date = current_date + timedelta(days=delta_days + masaaktif)
-    new_exp_str = new_exp_date.strftime("%Y-%m-%d")
-    new_lines = [line.replace(f"### {user} {exp}", f"### {user} {new_exp_str}") if line.startswith(f"### {user} ") else line for line in lines]
-    write_file(vmess_file, new_lines)
-    
-    paradis_lines = read_file(paradis_file)
-    new_paradis_lines = []
-    for line in paradis_lines:
-        if line.startswith(f"###ws {user} {exp}"):
-            new_line = line.replace(f"###ws {user} {exp}", f"###ws {user} {new_exp_str}")
-        elif line.startswith(f"###grpc {user} {exp}"):
-            new_line = line.replace(f"###grpc {user} {exp}", f"###grpc {user} {new_exp_str}")
-        else:
-            new_line = line
-        new_paradis_lines.append(new_line)
-    
-    write_file(paradis_file, new_paradis_lines)
-    
-    return f"User {user} vmess extended to {new_exp_str}"
-
-@app.route("/renewtrojan")
-def renewtrojan():
-    masaaktif = int(request.args.get("exp"))
-    user = request.args.get("user")
-    trojan_file = '/etc/.trojan'
-    drawit_file = '/etc/default/syncron/drawit/drawit.json'
-    lines = read_file(trojan_file)
-    user_line = next((line for line in lines if line.startswith(f"### {user} ")), None)
-    if not user_line:
-        return "User not found"
-    exp = user_line.split()[2]
-    now = datetime.now().strftime("%Y-%m-%d")
-    current_exp_date = datetime.strptime(exp, "%Y-%m-%d")
-    current_date = datetime.strptime(now, "%Y-%m-%d")
-    delta_days = (current_exp_date - current_date).days
-    new_exp_date = current_date + timedelta(days=delta_days + masaaktif)
-    new_exp_str = new_exp_date.strftime("%Y-%m-%d")
-    new_lines = [line.replace(f"### {user} {exp}", f"### {user} {new_exp_str}") if line.startswith(f"### {user} ") else line for line in lines]
-    write_file(trojan_file, new_lines)
-    
-    drawit_lines = read_file(drawit_file)
-    new_drawit_lines = []
-    for line in drawit_lines:
-        if line.startswith(f"###ws {user} {exp}"):
-            new_line = line.replace(f"###ws {user} {exp}", f"###ws {user} {new_exp_str}")
-        elif line.startswith(f"###grpc {user} {exp}"):
-            new_line = line.replace(f"###grpc {user} {exp}", f"###grpc {user} {new_exp_str}")
-        else:
-            new_line = line
-        new_drawit_lines.append(new_line)
-    
-    write_file(drawit_file, new_drawit_lines)
-    
-    return f"User {user} trojan extended to {new_exp_str}"
-    
 @app.route("/renewvless")
-def renewvless():
+@app.route("/renewtrojan")
+def renew():
     masaaktif = int(request.args.get("exp"))
     user = request.args.get("user")
-    vless_file = '/etc/.vless'
-    sketsa_file = '/etc/default/syncron/sketsa/sketsa.json'
-    lines = read_file(vless_file)
+    endpoint = request.path  
+    if endpoint == "/renewvmess":
+        layanan = "vmess"
+    elif endpoint == "/renewvless":
+        layanan = "vless"
+    elif endpoint == "/renewtrojan":
+        layanan = "trojan"
+    else:
+        return "Invalid endpoint"
+
+    config = {
+        "vmess": {
+            "file_main": "/etc/.vmess",
+            "file_json": "/etc/default/syncron/paradis/paradis.json",
+            "quota_path": f"/etc/potatonc/vmess/{user}"
+        },
+        "trojan": {
+            "file_main": "/etc/.trojan",
+            "file_json": "/etc/default/syncron/drawit/drawit.json",
+            "quota_path": f"/etc/potatonc/trojan/{user}"
+        },
+        "vless": {
+            "file_main": "/etc/.vless",
+            "file_json": "/etc/default/syncron/sketsa/sketsa.json",
+            "quota_path": f"/etc/potatonc/vless/{user}"
+        }
+    }
+
+    file_main = config[layanan]["file_main"]
+    file_json = config[layanan]["file_json"]
+    quota_file = config[layanan]["quota_path"]
+
+    lines = read_file(file_main)
     user_line = next((line for line in lines if line.startswith(f"### {user} ")), None)
     if not user_line:
         return "User not found"
+
     exp = user_line.split()[2]
     now = datetime.now().strftime("%Y-%m-%d")
     current_exp_date = datetime.strptime(exp, "%Y-%m-%d")
@@ -449,23 +408,33 @@ def renewvless():
     delta_days = (current_exp_date - current_date).days
     new_exp_date = current_date + timedelta(days=delta_days + masaaktif)
     new_exp_str = new_exp_date.strftime("%Y-%m-%d")
-    new_lines = [line.replace(f"### {user} {exp}", f"### {user} {new_exp_str}") if line.startswith(f"### {user} ") else line for line in lines]
-    write_file(vless_file, new_lines)
-    
-    sketsa_lines = read_file(sketsa_file)
-    new_sketsa_lines = []
-    for line in sketsa_lines:
+
+    new_lines = [
+        line.replace(f"### {user} {exp}", f"### {user} {new_exp_str}") if line.startswith(f"### {user} ") else line
+        for line in lines
+    ]
+    write_file(file_main, new_lines)
+
+    json_lines = read_file(file_json)
+    new_json_lines = []
+    for line in json_lines:
         if line.startswith(f"###ws {user} {exp}"):
             new_line = line.replace(f"###ws {user} {exp}", f"###ws {user} {new_exp_str}")
         elif line.startswith(f"###grpc {user} {exp}"):
             new_line = line.replace(f"###grpc {user} {exp}", f"###grpc {user} {new_exp_str}")
         else:
             new_line = line
-        new_sketsa_lines.append(new_line)
-    
-    write_file(sketsa_file, new_sketsa_lines)
-    
-    return f"User {user} vless extended to {new_exp_str}"
+        new_json_lines.append(new_line)
+
+    write_file(file_json, new_json_lines)
+
+    try:
+        with open(quota_file, 'w') as f:
+            f.write("0")
+    except Exception as e:
+        return f"Failed to reset quota: {e}"
+
+    return f"User {user} {layanan} extended to {new_exp_str}"
     
 @app.route("/create-vless")
 def create_vless():
@@ -491,7 +460,7 @@ def create_vless():
 
     today = datetime.today()
     later = today + timedelta(days=exp)
-    bytes_quota = int(quota) * (1024 ** 3)  # 1 GB = 1024^3 bytes
+    bytes_quota = int(quota) * (1024 ** 3)  
 
     try:
         sed_command = r'sed -i "/#vless$/a\###ws {} {} {}\\n}},{{\"id\": \"{}\",\"alterId\": 0,\"email\": \"{}\"" {}'.format(
@@ -560,8 +529,6 @@ def delete_user(protocol, user):
         "trojan": "drawit",
         "vless": "sketsa"
     }
-
-    # Cek apakah user ada di file JSON
     grep_process = subprocess.Popen(['grep', '-w', user, json_file[protocol]], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     grep_output, grep_error = grep_process.communicate()
 
@@ -572,7 +539,7 @@ def delete_user(protocol, user):
     logging.info(f"Grep output: {grep_output.decode('utf-8')}")
 
     try:
-        # Hapus user dari file log
+        
         sed_log_command = f'sed -i "/### {user} /d" {log_file[protocol]}'
         result_log = subprocess.run(sed_log_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result_log.returncode != 0:
@@ -580,7 +547,6 @@ def delete_user(protocol, user):
         else:
             logging.info(f"sed log command output: {result_log.stdout.decode('utf-8')}")
 
-        # Hapus blok JSON terkait user
         sed_json_command = f'sed -i "/^###ws {user} /,/^}}/d" {json_file[protocol]}'
         sed_json_command1 = f'sed -i "/^###grpc {user} /,/^}}/d" {json_file[protocol]}'
         subprocess.run(sed_json_command1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -590,7 +556,6 @@ def delete_user(protocol, user):
         else:
             logging.info(f"sed json command output: {result_json.stdout.decode('utf-8')}")
 
-        # Hapus file limit dan quota
         rm_limit_result = subprocess.run(f'rm -f {limit_path[protocol]}{user}', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if rm_limit_result.returncode != 0:
             logging.error(f"rm limit command error: {rm_limit_result.stderr.decode('utf-8')}")
@@ -603,7 +568,6 @@ def delete_user(protocol, user):
         else:
             logging.info(f"rm quota command output: {rm_quota_result.stdout.decode('utf-8')}")
 
-        # Restart service
         restart_result = subprocess.run(["systemctl", "restart", service[protocol]], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if restart_result.returncode != 0:
             logging.error(f"systemctl restart error: {restart_result.stderr.decode('utf-8')}")
